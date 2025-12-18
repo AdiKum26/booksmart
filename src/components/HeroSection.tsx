@@ -26,9 +26,15 @@ const HeroSection = () => {
           <p className="font-body text-text-light/80 text-lg mb-8">
             Just a college student who thinks that textbooks are overpriced
           </p>
-          <Button variant="hero" size="lg">
-            Sign up for our Mailing List!
-          </Button>
+          <a
+            href="https://docs.google.com/forms/d/e/1FAIpQLSe-Btn51mmLDURDpe9h-hKBDZp1ga3Cwu3vEIpEt3rFwBMGaQ/viewform"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <Button variant="hero" size="lg">
+              Sign up for our Mailing List!
+            </Button>
+          </a>
         </div>
       </div>
     </section>

@@ -27,9 +27,11 @@ const TutorialSection = () => {
               ))}
             </ul>
             <div className="flex flex-wrap gap-4">
-              <Button variant="default" size="lg" className="rounded-none">
-                Create an Account!
-              </Button>
+              <a href="#dashboard">
+                <Button variant="default" size="lg" className="rounded-none">
+                  Create an Account!
+                </Button>
+              </a>
               <Button variant="heroOutline" size="lg">
                 Contact us for Help!
               </Button>

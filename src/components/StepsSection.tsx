@@ -53,7 +53,7 @@ const StepsSection = () => {
               {/* Decorative corner curves */}
               <div className="absolute top-0 left-0 w-16 h-16 bg-dark rounded-br-[60px]" />
               <div className="absolute bottom-0 right-0 w-16 h-16 bg-dark rounded-tl-[60px]" />
-              
+
               <div className="relative z-10">
                 {/* Mock UI Elements */}
                 <div className="bg-secondary rounded-lg p-3 mb-4 min-h-[120px] flex items-center justify-center">
