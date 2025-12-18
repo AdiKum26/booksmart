@@ -7,7 +7,7 @@ const Header = () => {
 
   const navLinks = [
     { label: "About Us", href: "/about-us", isRoute: true },
-    { label: "Dashboard", href: "#dashboard", isRoute: false },
+    { label: "Dashboard", href: "/dashboard", isRoute: true },
     { label: "Shop", href: "#shop", isRoute: false },
     { label: "Store List", href: "#stores", isRoute: false },
     { label: "Checkout", href: "#checkout", isRoute: false },
