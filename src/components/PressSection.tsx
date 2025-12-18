@@ -11,9 +11,15 @@ const PressSection = () => {
           <p className="font-display text-3xl md:text-4xl font-medium text-foreground underline underline-offset-4 mb-8">
             THEDAILYUW
           </p>
-          <Button variant="default" size="lg" className="rounded-none">
-            Read The Article
-          </Button>
+          <a 
+            href="https://www.dailyuw.com/article/student-led-nonprofit-booksmart-launches-site-for-used-textbook-resale-20251031"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <Button variant="default" size="lg" className="rounded-none">
+              Read The Article
+            </Button>
+          </a>
         </div>
       </div>
     </section>
