@@ -7,12 +7,14 @@ const Header = () => {
 
   const navLinks = [
     { label: "About Us", href: "/about-us", isRoute: true },
+    { label: "Join Us", href: "/join-us", isRoute: true },
     { label: "Dashboard", href: "/dashboard", isRoute: true },
     { label: "Shop", href: "#shop", isRoute: false },
     { label: "Store List", href: "#stores", isRoute: false },
     { label: "Checkout", href: "#checkout", isRoute: false },
     { label: "Cart", href: "#cart", isRoute: false },
     { label: "My account", href: "#account", isRoute: false },
+    { label: "Contact Us", href: "/contact-us", isRoute: true },
   ];
 
   return (
@@ -59,7 +61,7 @@ const Header = () => {
             <button className="text-dark/80 hover:text-dark transition-colors">
               <ShoppingBag className="w-5 h-5" />
             </button>
-            
+
             {/* Mobile Menu Button */}
             <button
               className="lg:hidden text-dark/80 hover:text-dark"

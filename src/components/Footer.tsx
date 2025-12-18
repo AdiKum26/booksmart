@@ -3,13 +3,12 @@ import { BookOpen } from "lucide-react";
 const Footer = () => {
   const footerLinks = {
     about: [
-      { label: "Team", href: "#team" },
-      { label: "History", href: "#history" },
-      { label: "Join us", href: "#join" },
+      { label: "Team", href: "/about-us#team" },
+      { label: "Join us", href: "/join-us" },
     ],
     privacy: [
-      { label: "Terms and Conditions", href: "#terms" },
-      { label: "Contact Us", href: "#contact" },
+      { label: "Terms and Conditions", href: "/terms" },
+      { label: "Contact Us", href: "/contact-us" },
     ],
     social: [
       { label: "Linkedin", href: "#linkedin" },
