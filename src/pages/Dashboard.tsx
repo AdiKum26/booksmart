@@ -8,7 +8,7 @@ import { Label } from "@/components/ui/label";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import heroBookImage from "@/assets/hero-book.jpg";
-import helpStudentImage from "@/assets/help-section-student.jpg";
+import helpStudentImage from "@/assets/help-section-stressed-student.jpg";
 
 const Dashboard = () => {
   const [showPassword, setShowPassword] = useState(false);
@@ -147,7 +147,7 @@ const Dashboard = () => {
       </section>
 
       {/* Help Section */}
-      <section className="py-16 md:py-24 bg-dark">
+      <section className="py-16 md:py-24 bg-black">
         <div className="container-main">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             <div>
@@ -169,19 +169,19 @@ const Dashboard = () => {
                 </li>
               </ul>
               <div className="flex gap-4">
-                <Button variant="outline" className="rounded-none border-text-light text-text-light bg-transparent hover:bg-text-light hover:text-dark">
+                <Button className="rounded-none bg-text-light text-dark hover:bg-text-light/90">
                   Contact Us!
                 </Button>
-                <Button className="rounded-none bg-text-light text-dark hover:bg-text-light/90">
+                <Button variant="outline" className="rounded-none border-text-light text-text-light bg-transparent hover:bg-text-light hover:text-dark">
                   More Info
                 </Button>
               </div>
             </div>
-            <div className="flex justify-center lg:justify-end">
+            <div className="flex justify-center lg:justify-end items-center">
               <img
                 src={helpStudentImage}
                 alt="Student working on laptop"
-                className="w-full max-w-lg h-auto object-cover"
+                className="w-full max-w-md lg:max-w-lg h-auto object-cover rounded-sm"
               />
             </div>
           </div>
