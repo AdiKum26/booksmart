@@ -1,4 +1,4 @@
-import { BookOpen } from "lucide-react";
+import logo from "@/assets/logo.png";
 
 const Footer = () => {
   const footerLinks = {
@@ -23,15 +23,9 @@ const Footer = () => {
         <div className="grid md:grid-cols-2 lg:grid-cols-5 gap-12">
           {/* Brand */}
           <div className="lg:col-span-2">
-            <div className="flex items-center gap-2 mb-4">
-              <BookOpen className="w-6 h-6 text-foreground" />
+            <div className="mb-4">
+              <img src={logo} alt="Smart Booksmart Exchange" className="h-16 w-auto" />
             </div>
-            <h3 className="font-body text-lg font-semibold text-foreground mb-2">
-              Booksmart Ex.
-            </h3>
-            <p className="font-body text-muted-foreground mb-4">
-              Save Money, Save Nature, Safe Future
-            </p>
             <p className="font-body text-sm text-muted-foreground">
               © 2025 Booksmart Exchange
             </p>

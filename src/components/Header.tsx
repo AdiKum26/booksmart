@@ -1,6 +1,7 @@
 import { ShoppingBag, Menu, X } from "lucide-react";
 import { useState } from "react";
 import { Link } from "react-router-dom";
+import logo from "@/assets/logo.png";
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -22,15 +23,8 @@ const Header = () => {
       <div className="container-main">
         <div className="flex items-center justify-between h-16 md:h-20">
           {/* Logo */}
-          <Link to="/" className="flex items-center gap-3">
-            <div className="flex flex-col items-center bg-white px-2 py-1 border border-gray-200">
-              <span className="text-xs font-bold tracking-wider text-dark">SMART</span>
-              <div className="flex gap-0.5">
-                <div className="w-4 h-5 bg-dark rounded-sm" />
-                <div className="w-4 h-5 bg-dark rounded-sm" />
-              </div>
-            </div>
-            <span className="font-body text-lg font-semibold text-dark">Booksmart Ex.</span>
+          <Link to="/" className="flex items-center">
+            <img src={logo} alt="Smart Booksmart Exchange" className="h-12 w-auto" />
           </Link>
 
           {/* Desktop Navigation */}
