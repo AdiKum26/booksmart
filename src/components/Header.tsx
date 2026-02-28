@@ -9,12 +9,11 @@ const Header = () => {
   const navLinks = [
     { label: "About Us", href: "/about-us", isRoute: true },
     { label: "Join Us", href: "/join-us", isRoute: true },
-    { label: "Dashboard", href: "/dashboard", isRoute: true },
     { label: "Shop", href: "/shop", isRoute: true },
     { label: "Store List", href: "#stores", isRoute: false },
     { label: "Checkout", href: "#checkout", isRoute: false },
     { label: "Cart", href: "#cart", isRoute: false },
-    { label: "My account", href: "#account", isRoute: false },
+    { label: "My account", href: "/my-account", isRoute: true },
     { label: "Contact Us", href: "/contact-us", isRoute: true },
   ];
 
