@@ -10,7 +10,7 @@ const Header = () => {
     { label: "About Us", href: "/about-us", isRoute: true },
     { label: "Join Us", href: "/join-us", isRoute: true },
     { label: "Shop", href: "/shop", isRoute: true },
-    { label: "Store List", href: "#stores", isRoute: false },
+    { label: "Store List", href: "/store-list", isRoute: true },
     { label: "Checkout", href: "#checkout", isRoute: false },
     { label: "Cart", href: "#cart", isRoute: false },
     { label: "My account", href: "/my-account", isRoute: true },

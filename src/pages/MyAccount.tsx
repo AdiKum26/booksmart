@@ -7,6 +7,7 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import VendorDashboard from "@/components/VendorDashboard";
 import heroBookImage from "@/assets/hero-book.jpg";
 import helpStudentImage from "@/assets/help-section-stressed-student.jpg";
 import { supabase } from "@/lib/supabase";
@@ -18,6 +19,7 @@ const MyAccount = () => {
   const [userType, setUserType] = useState("customer");
   const [rememberMe, setRememberMe] = useState(false);
   const [user, setUser] = useState<User | null>(null);
+  const [isVendor, setIsVendor] = useState(false);
   const { toast } = useToast();
 
   // Login state
@@ -42,6 +44,20 @@ const MyAccount = () => {
 
     return () => subscription.unsubscribe();
   }, []);
+
+  // Check if user has a store (is a vendor)
+  useEffect(() => {
+    if (user) {
+      supabase
+        .from("stores")
+        .select("id")
+        .eq("user_id", user.id)
+        .maybeSingle()
+        .then(({ data }) => {
+          setIsVendor(!!data);
+        });
+    }
+  }, [user]);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -70,11 +86,16 @@ const MyAccount = () => {
       toast({ title: "Registration failed", description: error.message, variant: "destructive" });
     } else {
       toast({ title: "Registration successful!", description: "Your account has been created." });
+      // If registered as vendor, set flag so dashboard shows
+      if (userType === "vendor") {
+        setIsVendor(true);
+      }
     }
   };
 
   const handleLogout = async () => {
     await supabase.auth.signOut();
+    setIsVendor(false);
     toast({ title: "Logged out", description: "You have been signed out." });
   };
 
@@ -106,16 +127,34 @@ const MyAccount = () => {
       {/* Logged-in state */}
       {user ? (
         <section className="py-16 md:py-24 bg-background">
-          <div className="container-main max-w-2xl">
-            <h2 className="font-display text-3xl md:text-4xl text-foreground mb-6">
-              Welcome back!
-            </h2>
-            <p className="font-body text-foreground/80 mb-4">
-              Logged in as <strong>{user.email}</strong>
-            </p>
-            <Button onClick={handleLogout} className="rounded-none bg-foreground text-background hover:bg-foreground/90">
-              Log out
-            </Button>
+          <div className="container-main max-w-5xl">
+            <div className="flex items-center justify-between mb-8">
+              <div>
+                <h2 className="font-display text-3xl md:text-4xl text-foreground mb-2">
+                  Welcome back!
+                </h2>
+                <p className="font-body text-foreground/80">
+                  Logged in as <strong>{user.email}</strong>
+                </p>
+              </div>
+              <Button onClick={handleLogout} className="rounded-none bg-foreground text-background hover:bg-foreground/90">
+                Log out
+              </Button>
+            </div>
+
+            {/* Vendor toggle for users who registered as customer but want vendor features */}
+            {!isVendor && (
+              <div className="border border-border p-6 mb-8">
+                <p className="font-body text-foreground/80 mb-4">
+                  Want to sell textbooks? Become a vendor to create your store and list products.
+                </p>
+                <Button onClick={() => setIsVendor(true)} className="rounded-none bg-foreground text-background hover:bg-foreground/90">
+                  Become a Vendor
+                </Button>
+              </div>
+            )}
+
+            {isVendor && <VendorDashboard user={user} />}
           </div>
         </section>
       ) : (
