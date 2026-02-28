@@ -27,6 +27,8 @@ const MyAccount = () => {
 
   // Register state
   const [registerEmail, setRegisterEmail] = useState("");
+  const [registerPassword, setRegisterPassword] = useState("");
+  const [showRegisterPassword, setShowRegisterPassword] = useState(false);
   const [registerLoading, setRegisterLoading] = useState(false);
 
   useEffect(() => {
@@ -61,16 +63,13 @@ const MyAccount = () => {
     setRegisterLoading(true);
     const { error } = await supabase.auth.signUp({
       email: registerEmail,
-      password: "", // Password will be set via the email link
-      options: {
-        emailRedirectTo: window.location.origin,
-      },
+      password: registerPassword,
     });
     setRegisterLoading(false);
     if (error) {
       toast({ title: "Registration failed", description: error.message, variant: "destructive" });
     } else {
-      toast({ title: "Check your email", description: "A link to set your password has been sent." });
+      toast({ title: "Registration successful!", description: "Your account has been created." });
     }
   };
 
@@ -208,9 +207,28 @@ const MyAccount = () => {
                         required
                       />
                     </div>
-                    <p className="font-body text-sm text-foreground/80">
-                      A link to set a new password will be sent to your email address.
-                    </p>
+                    <div>
+                      <Label htmlFor="register-password" className="font-body text-foreground">
+                        Password <span className="text-destructive">*</span>
+                      </Label>
+                      <div className="relative mt-2">
+                        <Input
+                          id="register-password"
+                          type={showRegisterPassword ? "text" : "password"}
+                          value={registerPassword}
+                          onChange={(e) => setRegisterPassword(e.target.value)}
+                          className="rounded-none border-foreground/30 pr-10"
+                          required
+                        />
+                        <button
+                          type="button"
+                          className="absolute right-3 top-1/2 -translate-y-1/2 text-foreground/60 hover:text-foreground"
+                          onClick={() => setShowRegisterPassword(!showRegisterPassword)}
+                        >
+                          {showRegisterPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                        </button>
+                      </div>
+                    </div>
                     <RadioGroup value={userType} onValueChange={setUserType} className="space-y-4">
                       <div className="flex items-center gap-3">
                         <RadioGroupItem value="customer" id="customer" />
