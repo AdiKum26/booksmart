@@ -10,7 +10,7 @@ import Footer from "@/components/Footer";
 import VendorDashboard from "@/components/VendorDashboard";
 import heroBookImage from "@/assets/hero-book.jpg";
 import helpStudentImage from "@/assets/help-section-stressed-student.jpg";
-import { supabase } from "@/lib/supabase";
+import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import type { User } from "@supabase/supabase-js";
 
