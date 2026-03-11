@@ -33,6 +33,8 @@ const MyAccount = () => {
   const [showRegisterPassword, setShowRegisterPassword] = useState(false);
   const [registerLoading, setRegisterLoading] = useState(false);
 
+  const normalizeEmail = (value: string) => value.trim().toLowerCase();
+
   useEffect(() => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       setUser(session?.user ?? null);
@@ -61,35 +63,73 @@ const MyAccount = () => {
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
+    const email = normalizeEmail(loginEmail);
+
     setLoginLoading(true);
-    const { error } = await supabase.auth.signInWithPassword({
-      email: loginEmail,
-      password: loginPassword,
-    });
-    setLoginLoading(false);
-    if (error) {
-      toast({ title: "Login failed", description: error.message, variant: "destructive" });
-    } else {
+    try {
+      const { error } = await supabase.auth.signInWithPassword({
+        email,
+        password: loginPassword,
+      });
+
+      if (error) {
+        toast({ title: "Login failed", description: error.message, variant: "destructive" });
+        return;
+      }
+
+      setLoginEmail(email);
+      setLoginPassword("");
       toast({ title: "Welcome back!", description: "You have been logged in." });
+    } catch (error) {
+      toast({
+        title: "Login failed",
+        description: error instanceof Error ? error.message : "Unexpected error during login.",
+        variant: "destructive",
+      });
+    } finally {
+      setLoginLoading(false);
     }
   };
 
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
+    const email = normalizeEmail(registerEmail);
+
     setRegisterLoading(true);
-    const { error } = await supabase.auth.signUp({
-      email: registerEmail,
-      password: registerPassword,
-    });
-    setRegisterLoading(false);
-    if (error) {
-      toast({ title: "Registration failed", description: error.message, variant: "destructive" });
-    } else {
+    try {
+      const { data, error } = await supabase.auth.signUp({
+        email,
+        password: registerPassword,
+      });
+
+      if (error) {
+        toast({ title: "Registration failed", description: error.message, variant: "destructive" });
+        return;
+      }
+
+      setRegisterEmail(email);
+      setRegisterPassword("");
+
+      if (!data.session) {
+        toast({
+          title: "Check your email to finish registration",
+          description: "We sent a confirmation link to activate your account.",
+        });
+        return;
+      }
+
       toast({ title: "Registration successful!", description: "Your account has been created." });
-      // If registered as vendor, set flag so dashboard shows
       if (userType === "vendor") {
         setIsVendor(true);
       }
+    } catch (error) {
+      toast({
+        title: "Registration failed",
+        description: error instanceof Error ? error.message : "Unexpected error during registration.",
+        variant: "destructive",
+      });
+    } finally {
+      setRegisterLoading(false);
     }
   };
 
@@ -175,9 +215,10 @@ const MyAccount = () => {
                       </Label>
                       <Input
                         id="login-email"
-                        type="text"
+                        type="email"
                         value={loginEmail}
                         onChange={(e) => setLoginEmail(e.target.value)}
+                        autoComplete="email"
                         className="mt-2 rounded-none border-foreground/30"
                         required
                       />
@@ -192,6 +233,7 @@ const MyAccount = () => {
                           type={showPassword ? "text" : "password"}
                           value={loginPassword}
                           onChange={(e) => setLoginPassword(e.target.value)}
+                          autoComplete="current-password"
                           className="rounded-none border-foreground/30 pr-10"
                           required
                         />
@@ -205,7 +247,7 @@ const MyAccount = () => {
                       </div>
                     </div>
                     <div className="flex items-center gap-4">
-                      <Button type="submit" disabled={loginLoading} className="rounded-none bg-foreground text-background hover:bg-foreground/90">
+                      <Button type="submit" disabled={loginLoading || registerLoading} className="rounded-none bg-foreground text-background hover:bg-foreground/90">
                         {loginLoading ? "Logging in..." : "Log in"}
                       </Button>
                       <div className="flex items-center gap-2">
@@ -242,6 +284,7 @@ const MyAccount = () => {
                         type="email"
                         value={registerEmail}
                         onChange={(e) => setRegisterEmail(e.target.value)}
+                        autoComplete="email"
                         className="mt-2 rounded-none border-foreground/30"
                         required
                       />
@@ -256,6 +299,7 @@ const MyAccount = () => {
                           type={showRegisterPassword ? "text" : "password"}
                           value={registerPassword}
                           onChange={(e) => setRegisterPassword(e.target.value)}
+                          autoComplete="new-password"
                           className="rounded-none border-foreground/30 pr-10"
                           required
                         />
@@ -282,7 +326,7 @@ const MyAccount = () => {
                         </Label>
                       </div>
                     </RadioGroup>
-                    <Button type="submit" disabled={registerLoading} className="rounded-none bg-foreground text-background hover:bg-foreground/90">
+                    <Button type="submit" disabled={registerLoading || loginLoading} className="rounded-none bg-foreground text-background hover:bg-foreground/90">
                       {registerLoading ? "Registering..." : "Register"}
                     </Button>
                   </form>

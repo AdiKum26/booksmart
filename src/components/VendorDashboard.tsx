@@ -87,6 +87,14 @@ const VendorDashboard = ({ user }: { user: User }) => {
       supabase.from("categories").select("*").order("name"),
     ]);
 
+    if (storeRes.error) {
+      toast({ title: "Error loading store", description: storeRes.error.message, variant: "destructive" });
+    }
+
+    if (catRes.error) {
+      toast({ title: "Error loading categories", description: catRes.error.message, variant: "destructive" });
+    }
+
     if (storeRes.data) {
       setStore(storeRes.data);
       const prodRes = await supabase
@@ -94,8 +102,17 @@ const VendorDashboard = ({ user }: { user: User }) => {
         .select("*, categories(name)")
         .eq("store_id", storeRes.data.id)
         .order("created_at", { ascending: false });
+
+      if (prodRes.error) {
+        toast({ title: "Error loading products", description: prodRes.error.message, variant: "destructive" });
+      }
+
       setProducts(prodRes.data || []);
+    } else {
+      setStore(null);
+      setProducts([]);
     }
+
     setCategories(catRes.data || []);
     setLoading(false);
   };
