@@ -8,6 +8,7 @@ import AboutUs from "./pages/AboutUs";
 import MyAccount from "./pages/MyAccount";
 import Shop from "./pages/Shop";
 import StoreList from "./pages/StoreList";
+import ResetPassword from "./pages/ResetPassword";
 import NotFound from "./pages/NotFound";
 
 import JoinUs from "./pages/JoinUs";
