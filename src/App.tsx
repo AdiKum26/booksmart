@@ -13,6 +13,7 @@ import NotFound from "./pages/NotFound";
 import JoinUs from "./pages/JoinUs";
 import Terms from "./pages/Terms";
 import ContactUs from "./pages/ContactUs";
+import AiAssistant from "./components/AiAssistant";
 
 const queryClient = new QueryClient();
 
