@@ -16,7 +16,7 @@ const TutorialSection = () => {
           {/* Content */}
           <div>
             <h2 className="heading-section text-foreground mb-8">
-              Below is a video tutorial to assist you in navigating our Account creation process.
+              Ask our AI assistant for help navigating our website!
             </h2>
             <ul className="space-y-4 mb-8">
               {features.map((feature, index) => (
