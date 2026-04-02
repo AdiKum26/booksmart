@@ -21,6 +21,7 @@ interface Product {
   image_url: string | null;
   on_sale: boolean;
   category_id: string | null;
+  store_id: string;
   categories?: { name: string } | null;
   stores?: { name: string } | null;
 }
