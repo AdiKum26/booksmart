@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Phone, Mail, MapPin, ChevronRight } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { supabase } from "@/integrations/supabase/client";
@@ -16,21 +16,21 @@ interface StoreData {
 }
 
 const StoreList = () => {
+  const [searchParams] = useSearchParams();
+  const storeFilter = searchParams.get("store");
   const [stores, setStores] = useState<StoreData[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchStores = async () => {
-      const { data } = await supabase
-        .from("stores")
-        .select("*")
-        .order("created_at", { ascending: false });
+      let query = supabase.from("stores").select("*").order("created_at", { ascending: false });
+      if (storeFilter) query = query.eq("id", storeFilter);
+      const { data } = await query;
       setStores(data || []);
       setLoading(false);
     };
     fetchStores();
-  }, []);
-
+  }, [storeFilter]);
   return (
     <div className="min-h-screen bg-background">
       <Header />
