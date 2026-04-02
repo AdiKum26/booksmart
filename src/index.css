@@ -135,7 +135,7 @@
   }
 
   .heading-section {
-    @apply font-display text-3xl md:text-4xl font-normal italic;
+    @apply font-display text-3xl md:text-4xl font-normal;
   }
 
   .text-body {
