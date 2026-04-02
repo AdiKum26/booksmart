@@ -59,7 +59,7 @@ const StoreList = () => {
         ) : (
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {stores.map((store) => (
-              <div key={store.id} className="bg-foreground/80 text-background p-6 flex flex-col justify-between min-h-[250px]">
+              <div key={store.id} id={`store-${store.id}`} className="bg-foreground/80 text-background p-6 flex flex-col justify-between min-h-[250px] scroll-mt-24">
                 <div>
                   <h3 className="font-display text-2xl mb-3">{store.name}</h3>
                   {store.description && (

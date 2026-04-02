@@ -21,6 +21,7 @@ interface Product {
   image_url: string | null;
   on_sale: boolean;
   category_id: string | null;
+  store_id: string;
   categories?: { name: string } | null;
   stores?: { name: string } | null;
 }
@@ -59,9 +60,11 @@ const ProductCard = ({ product }: { product: Product }) => (
       <span className="text-foreground font-medium">${Number(product.price).toFixed(2)}</span>
     </div>
     <div className="flex justify-center">
-      <Button className="bg-foreground text-background hover:bg-foreground/90 rounded-none px-6 py-2 text-sm font-medium">
-        Add to cart
-      </Button>
+      <Link to={`/store-list#store-${product.store_id}`}>
+        <Button className="bg-foreground text-background hover:bg-foreground/90 rounded-none px-6 py-2 text-sm font-medium">
+          Contact owner
+        </Button>
+      </Link>
     </div>
   </div>
 );
