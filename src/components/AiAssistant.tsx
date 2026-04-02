@@ -73,7 +73,14 @@ async function streamChat({
 }
 
 const AiAssistant = () => {
-  const [open, setOpen] = useState(false);
+  const [open, setOpen] = useState(() => {
+    const hasVisited = sessionStorage.getItem("ai-chat-shown");
+    if (!hasVisited) {
+      sessionStorage.setItem("ai-chat-shown", "true");
+      return true;
+    }
+    return false;
+  });
   const [messages, setMessages] = useState<Msg[]>([]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
