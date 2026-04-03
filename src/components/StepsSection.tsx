@@ -5,8 +5,11 @@ const StepsSection = () => {
         <div className="flex justify-center">
           <video
             className="w-full max-w-4xl rounded-lg shadow-lg"
-            controls
-            preload="metadata"
+            autoPlay
+            loop
+            muted
+            playsInline
+            preload="auto"
           >
             <source src="/videos/welcome.mp4" type="video/mp4" />
             Your browser does not support the video tag.
