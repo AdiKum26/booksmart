@@ -18,6 +18,7 @@ const MyAccount = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [userType, setUserType] = useState("customer");
   const [rememberMe, setRememberMe] = useState(false);
+  const [agreeTerms, setAgreeTerms] = useState(false);
   const [user, setUser] = useState<User | null>(null);
   const [isVendor, setIsVendor] = useState(false);
   const { toast } = useToast();
