@@ -18,6 +18,7 @@ const MyAccount = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [userType, setUserType] = useState("customer");
   const [rememberMe, setRememberMe] = useState(false);
+  const [agreeTerms, setAgreeTerms] = useState(false);
   const [user, setUser] = useState<User | null>(null);
   const [isVendor, setIsVendor] = useState(false);
   const { toast } = useToast();
@@ -299,7 +300,20 @@ const MyAccount = () => {
                         </Label>
                       </div>
                     </RadioGroup>
-                    <Button type="submit" disabled={registerLoading} className="rounded-none bg-foreground text-background hover:bg-foreground/90">
+                    <div className="flex items-center gap-2">
+                      <Checkbox
+                        id="agree-terms"
+                        checked={agreeTerms}
+                        onCheckedChange={(checked) => setAgreeTerms(checked as boolean)}
+                      />
+                      <Label htmlFor="agree-terms" className="font-body text-sm text-foreground">
+                        I agree with the{" "}
+                        <a href="/terms" className="text-primary underline hover:no-underline">
+                          Terms and Conditions
+                        </a>
+                      </Label>
+                    </div>
+                    <Button type="submit" disabled={registerLoading || !agreeTerms} className="rounded-none bg-foreground text-background hover:bg-foreground/90">
                       {registerLoading ? "Registering..." : "Register"}
                     </Button>
                   </form>
