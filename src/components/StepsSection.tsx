@@ -5,11 +5,6 @@ const StepsSection = () => {
         <div className="flex justify-center">
           <video
             className="w-full max-w-4xl rounded-lg shadow-lg"
-            controls
-            preload="metadata"
-          >
-          <video
-            className="w-full max-w-4xl rounded-lg shadow-lg"
             autoPlay
             loop
             muted
