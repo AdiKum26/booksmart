@@ -8,6 +8,14 @@ const StepsSection = () => {
             controls
             preload="metadata"
           >
+          <video
+            className="w-full max-w-4xl rounded-lg shadow-lg"
+            autoPlay
+            loop
+            muted
+            playsInline
+            preload="auto"
+          >
             <source src="/videos/welcome.mp4" type="video/mp4" />
             Your browser does not support the video tag.
           </video>
