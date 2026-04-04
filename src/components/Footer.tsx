@@ -27,7 +27,7 @@ const Footer = () => {
               <img src={logo} alt="Smart Booksmart Exchange" className="h-16 w-auto" />
             </div>
             <p className="font-body text-sm text-muted-foreground">
-              © 2025 Booksmart Exchange
+              © 2026 Booksmart Exchange
             </p>
           </div>
 
