@@ -1,5 +1,7 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useSearchParams } from "react-router-dom";
+import { Search } from "lucide-react";
+import { Input } from "@/components/ui/input";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
@@ -16,6 +18,7 @@ import { supabase } from "@/integrations/supabase/client";
 interface Product {
   id: string;
   title: string;
+  description: string | null;
   price: number;
   original_price: number | null;
   image_url: string | null;
@@ -76,6 +79,7 @@ const Shop = () => {
   const [categories, setCategories] = useState<Category[]>([]);
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [sortBy, setSortBy] = useState("default");
+  const [searchQuery, setSearchQuery] = useState("");
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -98,6 +102,14 @@ const Shop = () => {
   }, [storeFilter]);
 
   let filtered = [...products];
+  if (searchQuery.trim()) {
+    const q = searchQuery.toLowerCase();
+    filtered = filtered.filter(
+      (p) =>
+        p.title.toLowerCase().includes(q) ||
+        (p.description && p.description.toLowerCase().includes(q))
+    );
+  }
   if (selectedCategory !== "all") {
     filtered = filtered.filter((p) => p.category_id === selectedCategory);
   }
@@ -122,10 +134,20 @@ const Shop = () => {
 
         <h1 className="font-serif text-4xl md:text-5xl text-foreground mb-6">Shop</h1>
 
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-4">
           <p className="text-muted-foreground text-sm">
             Showing {filtered.length} result{filtered.length !== 1 ? "s" : ""}
           </p>
+
+          <div className="relative w-full sm:w-[300px]">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            <Input
+              placeholder="Search by title or description..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="pl-9 rounded-none border-border"
+            />
+          </div>
 
           <div className="flex gap-3">
             <Select value={selectedCategory} onValueChange={setSelectedCategory}>
