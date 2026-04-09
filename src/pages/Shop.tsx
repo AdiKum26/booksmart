@@ -102,6 +102,14 @@ const Shop = () => {
   }, [storeFilter]);
 
   let filtered = [...products];
+  if (searchQuery.trim()) {
+    const q = searchQuery.toLowerCase();
+    filtered = filtered.filter(
+      (p) =>
+        p.title.toLowerCase().includes(q) ||
+        (p.description && p.description.toLowerCase().includes(q))
+    );
+  }
   if (selectedCategory !== "all") {
     filtered = filtered.filter((p) => p.category_id === selectedCategory);
   }
