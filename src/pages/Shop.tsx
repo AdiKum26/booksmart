@@ -18,6 +18,7 @@ import { supabase } from "@/integrations/supabase/client";
 interface Product {
   id: string;
   title: string;
+  description: string | null;
   price: number;
   original_price: number | null;
   image_url: string | null;
