@@ -134,10 +134,20 @@ const Shop = () => {
 
         <h1 className="font-serif text-4xl md:text-5xl text-foreground mb-6">Shop</h1>
 
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-4">
           <p className="text-muted-foreground text-sm">
             Showing {filtered.length} result{filtered.length !== 1 ? "s" : ""}
           </p>
+
+          <div className="relative w-full sm:w-[300px]">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            <Input
+              placeholder="Search by title or description..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="pl-9 rounded-none border-border"
+            />
+          </div>
 
           <div className="flex gap-3">
             <Select value={selectedCategory} onValueChange={setSelectedCategory}>
