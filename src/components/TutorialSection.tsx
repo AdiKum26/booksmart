@@ -1,6 +1,7 @@
 import { Check } from "lucide-react";
 import geometricPattern from "@/assets/geometric-pattern.jpg";
 import { Button } from "@/components/ui/button";
+import { Link } from "react-router-dom";
 
 const TutorialSection = () => {
   const features = [
@@ -27,11 +28,11 @@ const TutorialSection = () => {
               ))}
             </ul>
             <div className="flex flex-wrap gap-4">
-              <a href="#dashboard">
+              <Link to="/my-account">
                 <Button variant="default" size="lg" className="rounded-none">
                   Create an Account!
                 </Button>
-              </a>
+              </Link>
               <Button variant="heroOutline" size="lg">
                 Contact us for Help!
               </Button>

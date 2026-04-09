@@ -11,9 +11,7 @@ const Footer = () => {
       { label: "Contact Us", href: "/contact-us" },
     ],
     social: [
-      { label: "Linkedin", href: "#linkedin" },
-      { label: "Instagram", href: "#instagram" },
-      { label: "Twitter/X", href: "#twitter" },
+      { label: "Instagram", href: "https://www.instagram.com/booksmartexllc?utm_source=ig_web_button_share_sheet&igsh=ZDNlZDc0MzIxNw==" },
     ],
   };
 
@@ -73,6 +71,8 @@ const Footer = () => {
                 <li key={link.label}>
                   <a
                     href={link.href}
+                    target="_blank"
+                    rel="noopener noreferrer"
                     className="font-body text-muted-foreground hover:text-foreground transition-colors"
                   >
                     {link.label}

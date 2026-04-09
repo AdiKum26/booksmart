@@ -8,6 +8,7 @@ import { Label } from "@/components/ui/label";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import VendorDashboard from "@/components/VendorDashboard";
+import MessagesInbox from "@/components/MessagesInbox";
 import heroBookImage from "@/assets/hero-book.jpg";
 import helpStudentImage from "@/assets/help-section-stressed-student.jpg";
 import { supabase } from "@/integrations/supabase/client";
@@ -17,7 +18,6 @@ import type { User } from "@supabase/supabase-js";
 const MyAccount = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [userType, setUserType] = useState("customer");
-  const [rememberMe, setRememberMe] = useState(false);
   const [agreeTerms, setAgreeTerms] = useState(false);
   const [user, setUser] = useState<User | null>(null);
   const [isVendor, setIsVendor] = useState(false);
@@ -78,19 +78,26 @@ const MyAccount = () => {
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
     setRegisterLoading(true);
-    const { error } = await supabase.auth.signUp({
+    const { data, error } = await supabase.auth.signUp({
       email: registerEmail,
       password: registerPassword,
     });
-    setRegisterLoading(false);
     if (error) {
+      setRegisterLoading(false);
       toast({ title: "Registration failed", description: error.message, variant: "destructive" });
-    } else {
-      toast({ title: "Registration successful!", description: "Your account has been created." });
-      // If registered as vendor, set flag so dashboard shows
-      if (userType === "vendor") {
-        setIsVendor(true);
-      }
+      return;
+    }
+    // Auto-login if Supabase didn't create a session (email confirmation disabled)
+    if (!data.session) {
+      await supabase.auth.signInWithPassword({
+        email: registerEmail,
+        password: registerPassword,
+      });
+    }
+    setRegisterLoading(false);
+    toast({ title: "Registration successful!", description: "Your account has been created." });
+    if (userType === "vendor") {
+      setIsVendor(true);
     }
   };
 
@@ -142,6 +149,8 @@ const MyAccount = () => {
                 Log out
               </Button>
             </div>
+
+            <MessagesInbox userId={user.id} />
 
             {/* Vendor toggle for users who registered as customer but want vendor features */}
             {!isVendor && (
@@ -209,16 +218,6 @@ const MyAccount = () => {
                       <Button type="submit" disabled={loginLoading} className="rounded-none bg-foreground text-background hover:bg-foreground/90">
                         {loginLoading ? "Logging in..." : "Log in"}
                       </Button>
-                      <div className="flex items-center gap-2">
-                        <Checkbox
-                          id="remember"
-                          checked={rememberMe}
-                          onCheckedChange={(checked) => setRememberMe(checked as boolean)}
-                        />
-                        <Label htmlFor="remember" className="font-body text-sm text-foreground">
-                          Remember me
-                        </Label>
-                      </div>
                     </div>
                     <button
                       type="button"

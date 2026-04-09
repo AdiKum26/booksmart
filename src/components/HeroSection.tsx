@@ -18,7 +18,7 @@ const HeroSection = () => {
       <div className="relative container-main py-20 md:py-32 lg:py-40">
         <div className="max-w-2xl">
           <h1 className="heading-display text-text-light mb-6">
-            Booksmart Ex.
+            Booksmart Exchange
           </h1>
           <p className="font-body text-lg font-semibold text-text-light mb-4">
             Save Money, Save Nature, Safe Future

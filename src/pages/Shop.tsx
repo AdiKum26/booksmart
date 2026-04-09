@@ -1,10 +1,9 @@
-import { useState, useEffect, useMemo } from "react";
-import { useSearchParams } from "react-router-dom";
-import { Search } from "lucide-react";
-import { Input } from "@/components/ui/input";
+import { useState, useEffect, useRef } from "react";
+import { useSearchParams, useNavigate } from "react-router-dom";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import {
   Select,
   SelectContent,
@@ -13,7 +12,11 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Link } from "react-router-dom";
+import { Search } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
+import MessageDialog from "@/components/MessageDialog";
+import type { User } from "@supabase/supabase-js";
 
 interface Product {
   id: string;
@@ -25,6 +28,7 @@ interface Product {
   on_sale: boolean;
   category_id: string | null;
   store_id: string;
+  user_id: string;
   categories?: { name: string } | null;
   stores?: { name: string } | null;
 }
@@ -34,7 +38,13 @@ interface Category {
   name: string;
 }
 
-const ProductCard = ({ product }: { product: Product }) => (
+const ProductCard = ({
+  product,
+  onMessage,
+}: {
+  product: Product;
+  onMessage: (product: Product) => void;
+}) => (
   <div className="flex flex-col">
     <div className="relative aspect-[4/5] mb-4 overflow-hidden bg-muted">
       {product.on_sale && (
@@ -63,33 +73,76 @@ const ProductCard = ({ product }: { product: Product }) => (
       <span className="text-foreground font-medium">${Number(product.price).toFixed(2)}</span>
     </div>
     <div className="flex justify-center">
-      <Link to={`/store-list?store=${product.store_id}`}>
-        <Button className="bg-foreground text-background hover:bg-foreground/90 rounded-none px-6 py-2 text-sm font-medium">
-          Contact owner
-        </Button>
-      </Link>
+      <Button
+        onClick={() => onMessage(product)}
+        className="bg-foreground text-background hover:bg-foreground/90 rounded-none px-6 py-2 text-sm font-medium"
+      >
+        Message Seller
+      </Button>
     </div>
   </div>
 );
 
 const Shop = () => {
   const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
+  const { toast } = useToast();
   const storeFilter = searchParams.get("store");
   const [products, setProducts] = useState<Product[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [sortBy, setSortBy] = useState("default");
-  const [searchQuery, setSearchQuery] = useState("");
   const [loading, setLoading] = useState(true);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [debouncedSearch, setDebouncedSearch] = useState("");
+  const debounceTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const [currentUser, setCurrentUser] = useState<User | null>(null);
+  const [messageTarget, setMessageTarget] = useState<Product | null>(null);
+
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setSearchQuery(value);
+    if (debounceTimer.current) clearTimeout(debounceTimer.current);
+    debounceTimer.current = setTimeout(() => setDebouncedSearch(value), 300);
+  };
+
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setCurrentUser(session?.user ?? null);
+    });
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setCurrentUser(session?.user ?? null);
+    });
+    return () => subscription.unsubscribe();
+  }, []);
+
+  const handleMessage = (product: Product) => {
+    if (!currentUser) {
+      toast({ title: "Sign in required", description: "Sign in to message sellers.", variant: "destructive" });
+      navigate("/my-account");
+      return;
+    }
+    if (currentUser.id === product.user_id) {
+      toast({ title: "That's your listing", description: "You can't message yourself." });
+      return;
+    }
+    setMessageTarget(product);
+  };
 
   useEffect(() => {
     const fetchData = async () => {
+      setLoading(true);
       const [prodRes, catRes] = await Promise.all([
         (() => {
           let query = supabase
             .from("products")
             .select("*, categories(name), stores(name)");
           if (storeFilter) query = query.eq("store_id", storeFilter);
+          if (debouncedSearch) {
+            query = query.or(
+              `title.ilike.%${debouncedSearch}%,description.ilike.%${debouncedSearch}%`
+            );
+          }
           return query;
         })(),
         supabase.from("categories").select("*").order("name"),
@@ -99,17 +152,9 @@ const Shop = () => {
       setLoading(false);
     };
     fetchData();
-  }, [storeFilter]);
+  }, [storeFilter, debouncedSearch]);
 
   let filtered = [...products];
-  if (searchQuery.trim()) {
-    const q = searchQuery.toLowerCase();
-    filtered = filtered.filter(
-      (p) =>
-        p.title.toLowerCase().includes(q) ||
-        (p.description && p.description.toLowerCase().includes(q))
-    );
-  }
   if (selectedCategory !== "all") {
     filtered = filtered.filter((p) => p.category_id === selectedCategory);
   }
@@ -134,20 +179,21 @@ const Shop = () => {
 
         <h1 className="font-serif text-4xl md:text-5xl text-foreground mb-6">Shop</h1>
 
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-4">
+        <div className="relative mb-6">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none" />
+          <Input
+            type="text"
+            placeholder="Search by title or description..."
+            value={searchQuery}
+            onChange={handleSearchChange}
+            className="pl-9 rounded-none border-border w-full sm:max-w-md"
+          />
+        </div>
+
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
           <p className="text-muted-foreground text-sm">
             Showing {filtered.length} result{filtered.length !== 1 ? "s" : ""}
           </p>
-
-          <div className="relative w-full sm:w-[300px]">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-            <Input
-              placeholder="Search by title or description..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-9 rounded-none border-border"
-            />
-          </div>
 
           <div className="flex gap-3">
             <Select value={selectedCategory} onValueChange={setSelectedCategory}>
@@ -179,15 +225,30 @@ const Shop = () => {
         {loading ? (
           <p className="text-center py-12 text-foreground/60">Loading products...</p>
         ) : filtered.length === 0 ? (
-          <p className="text-center py-12 text-foreground/60">No products available yet.</p>
+          <p className="text-center py-12 text-foreground/60">
+            {debouncedSearch
+              ? `No books found for "${debouncedSearch}".`
+              : "No products available yet."}
+          </p>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 mb-16">
             {filtered.map((product) => (
-              <ProductCard key={product.id} product={product} />
+              <ProductCard key={product.id} product={product} onMessage={handleMessage} />
             ))}
           </div>
         )}
       </main>
+
+      {messageTarget && currentUser && (
+        <MessageDialog
+          productId={messageTarget.id}
+          productTitle={messageTarget.title}
+          sellerId={messageTarget.user_id}
+          currentUserId={currentUser.id}
+          open={true}
+          onClose={() => setMessageTarget(null)}
+        />
+      )}
 
       <Footer />
     </div>
