@@ -3,6 +3,7 @@ import { Send } from "lucide-react";
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
@@ -195,6 +196,9 @@ const MessageDialog = ({
           <DialogTitle className="font-display text-lg leading-tight">
             {productTitle}
           </DialogTitle>
+          <DialogDescription className="sr-only">
+            Send and receive messages with the seller about {productTitle}.
+          </DialogDescription>
         </DialogHeader>
 
         {/* Messages */}
