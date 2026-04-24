@@ -88,3 +88,43 @@ Supabase Auth handles registration/login. On the `/my-account` page, authenticat
 - Supabase types in `src/integrations/supabase/types.ts` are generated — regenerate with `supabase gen types typescript` after schema changes, don't edit manually.
 - Path alias `@` maps to `./src` — use `@/components/...` style imports.
 - This project was scaffolded with Lovable; the `lovable-tagger` Vite plugin is active in dev mode.
+
+## Testing Requirements
+
+**Every new feature must be tested end-to-end before it is considered complete.**
+
+### Process
+
+1. **Write a Playwright test** in a `.cjs` file at the repo root (e.g. `test-<feature-name>.cjs`). The project uses `"type": "module"` in `package.json`, so test files must use the `.cjs` extension and CommonJS `require()`.
+
+2. **Cover the full user flow** — not just the happy path. Tests must include:
+   - All user roles that interact with the feature (e.g. buyer and vendor)
+   - The complete sequence of actions a real user would take
+   - Assertions that the feature works correctly from each role's perspective
+   - Assertions that error/empty states are handled correctly
+
+3. **Run the tests and confirm all pass** (`node test-<feature-name>.cjs`). Do not mark a feature done until the output shows 0 failures.
+
+4. **Capture screenshots** at key steps using `page.screenshot()` for visual confirmation. Save to `/tmp/booksmart-test/`.
+
+### Playwright setup
+
+```bash
+# Install (already in devDependencies after first use)
+npm install --save-dev playwright
+npx playwright install chromium
+```
+
+Run tests against the local dev server (`http://localhost:8080`) — ensure `npm run dev` is running first.
+
+### Test accounts
+
+- **Vendor**: fikstathebastard@gmail.com / Joburgjan@2017
+- **Buyer**: adideeavi01@gmail.com / Joburgjan@2017
+
+### Selector conventions
+
+- Use `#login-email` / `#login-password` for the login form (avoids ambiguity with the register form on the same page).
+- Use `.first()` on any locator that may match multiple elements to avoid strict-mode violations.
+- Use chained locators for dialog-scoped checks: `page.locator('[role="dialog"]').locator('text=...')`.
+- Use `.catch(() => false)` on `.isVisible()` calls so a strict-mode error doesn't crash the test.

@@ -26,6 +26,7 @@ interface MessageDialogProps {
   currentUserId: string;
   open: boolean;
   onClose: () => void;
+  existingConversationId?: string;
 }
 
 const MessageDialog = ({
@@ -35,8 +36,9 @@ const MessageDialog = ({
   currentUserId,
   open,
   onClose,
+  existingConversationId,
 }: MessageDialogProps) => {
-  const [conversationId, setConversationId] = useState<string | null>(null);
+  const [conversationId, setConversationId] = useState<string | null>(existingConversationId ?? null);
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
   const [sending, setSending] = useState(false);
@@ -52,21 +54,27 @@ const MessageDialog = ({
   useEffect(() => {
     if (!open) return;
     setLoading(true);
+    setConversationId(existingConversationId ?? null);
 
     const init = async () => {
-      const { data: existing } = await supabase
-        .from("conversations")
-        .select("id")
-        .eq("product_id", productId)
-        .eq("buyer_id", currentUserId)
-        .maybeSingle();
+      let convId = existingConversationId ?? null;
 
-      if (existing) {
-        setConversationId(existing.id);
+      if (!convId) {
+        const { data: existing } = await supabase
+          .from("conversations")
+          .select("id")
+          .eq("product_id", productId)
+          .eq("buyer_id", currentUserId)
+          .maybeSingle();
+        convId = existing?.id ?? null;
+      }
+
+      if (convId) {
+        setConversationId(convId);
         const { data: msgs } = await supabase
           .from("messages")
           .select("*")
-          .eq("conversation_id", existing.id)
+          .eq("conversation_id", convId)
           .order("created_at", { ascending: true });
         setMessages(msgs || []);
 
@@ -74,7 +82,7 @@ const MessageDialog = ({
         await supabase
           .from("messages")
           .update({ read_at: new Date().toISOString() })
-          .eq("conversation_id", existing.id)
+          .eq("conversation_id", convId)
           .neq("sender_id", currentUserId)
           .is("read_at", null);
       } else {

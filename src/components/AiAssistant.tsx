@@ -7,6 +7,12 @@ type Msg = { role: "user" | "assistant"; content: string };
 
 const CHAT_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/ai-assistant`;
 
+// How long to wait for the edge function to respond before giving up (ms)
+const FETCH_TIMEOUT_MS = 30_000;
+
+const QUOTA_MESSAGE =
+  "BookSmart AI has reached its daily usage limit. It resets every 24 hours — please try again tomorrow!";
+
 async function streamChat({
   messages,
   onDelta,
@@ -18,18 +24,39 @@ async function streamChat({
   onDone: () => void;
   onError: (msg: string) => void;
 }) {
-  const resp = await fetch(CHAT_URL, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
-    },
-    body: JSON.stringify({ messages }),
-  });
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), FETCH_TIMEOUT_MS);
+
+  let resp: Response;
+  try {
+    resp = await fetch(CHAT_URL, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
+      },
+      body: JSON.stringify({ messages }),
+      signal: controller.signal,
+    });
+  } catch (e) {
+    clearTimeout(timer);
+    const isTimeout = e instanceof Error && e.name === "AbortError";
+    onError(
+      isTimeout
+        ? "The AI took too long to respond. Please try again."
+        : "Could not reach BookSmart AI. Please check your connection."
+    );
+    return;
+  }
+  clearTimeout(timer);
 
   if (!resp.ok) {
     const data = await resp.json().catch(() => ({}));
-    onError(data.error || "Something went wrong. Please try again.");
+    if (data.error === "quota_exhausted" || resp.status === 429 || resp.status === 402) {
+      onError(QUOTA_MESSAGE);
+    } else {
+      onError(data.error || "Something went wrong. Please try again.");
+    }
     return;
   }
 
@@ -42,33 +69,45 @@ async function streamChat({
   const decoder = new TextDecoder();
   let buffer = "";
 
-  while (true) {
-    const { done, value } = await reader.read();
-    if (done) break;
-    buffer += decoder.decode(value, { stream: true });
+  try {
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      buffer += decoder.decode(value, { stream: true });
 
-    let newlineIdx: number;
-    while ((newlineIdx = buffer.indexOf("\n")) !== -1) {
-      let line = buffer.slice(0, newlineIdx);
-      buffer = buffer.slice(newlineIdx + 1);
-      if (line.endsWith("\r")) line = line.slice(0, -1);
-      if (line.startsWith(":") || line.trim() === "") continue;
-      if (!line.startsWith("data: ")) continue;
-      const jsonStr = line.slice(6).trim();
-      if (jsonStr === "[DONE]") {
-        onDone();
-        return;
-      }
-      try {
-        const parsed = JSON.parse(jsonStr);
-        const content = parsed.choices?.[0]?.delta?.content;
-        if (content) onDelta(content);
-      } catch {
-        buffer = line + "\n" + buffer;
-        break;
+      let newlineIdx: number;
+      while ((newlineIdx = buffer.indexOf("\n")) !== -1) {
+        let line = buffer.slice(0, newlineIdx);
+        buffer = buffer.slice(newlineIdx + 1);
+        if (line.endsWith("\r")) line = line.slice(0, -1);
+        if (line.startsWith(":") || line.trim() === "") continue;
+        if (!line.startsWith("data: ")) continue;
+        const jsonStr = line.slice(6).trim();
+        if (jsonStr === "[DONE]") {
+          onDone();
+          return;
+        }
+        try {
+          const parsed = JSON.parse(jsonStr);
+          const content = parsed.choices?.[0]?.delta?.content;
+          if (content) onDelta(content);
+        } catch {
+          buffer = line + "\n" + buffer;
+          break;
+        }
       }
     }
+  } catch (e) {
+    // Stream was cut or network error mid-response
+    const isTimeout = e instanceof Error && e.name === "AbortError";
+    onError(
+      isTimeout
+        ? "The AI took too long to respond. Please try again."
+        : "The connection was interrupted. Please try again."
+    );
+    return;
   }
+
   onDone();
 }
 

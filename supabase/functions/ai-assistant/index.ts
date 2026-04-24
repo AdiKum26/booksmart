@@ -26,6 +26,14 @@ const SYSTEM_PROMPT = `You are BookSmart AI, a friendly and knowledgeable assist
 
 Keep responses concise, friendly, and student-oriented. Use markdown formatting for clarity. If you don't know something specific about a product listing, suggest the student check the Shop page.`;
 
+// How long to wait for Google AI to start responding before giving up (ms)
+const FETCH_TIMEOUT_MS = 25_000;
+
+function isQuotaError(status: number): boolean {
+  // 429 = rate limit / quota; 402 = billing/payment required (spending limit hit)
+  return status === 429 || status === 402;
+}
+
 serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
@@ -33,45 +41,63 @@ serve(async (req) => {
 
   try {
     const { messages } = await req.json();
-    const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
-    if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY is not configured");
+    const GOOGLE_AI_KEY = Deno.env.get("GOOGLE_AI_KEY");
+    if (!GOOGLE_AI_KEY) throw new Error("GOOGLE_AI_KEY is not configured");
 
-    const response = await fetch(
-      "https://ai.gateway.lovable.dev/v1/chat/completions",
-      {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${LOVABLE_API_KEY}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          model: "google/gemini-3-flash-preview",
-          messages: [
-            { role: "system", content: SYSTEM_PROMPT },
-            ...messages,
-          ],
-          stream: true,
+    // Abort the upstream fetch if Google AI doesn't respond within the timeout
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), FETCH_TIMEOUT_MS);
+
+    let response: Response;
+    try {
+      response = await fetch(
+        "https://generativelanguage.googleapis.com/v1beta/openai/chat/completions",
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${GOOGLE_AI_KEY}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            model: "gemini-2.0-flash",
+            messages: [
+              { role: "system", content: SYSTEM_PROMPT },
+              ...messages,
+            ],
+            stream: true,
+          }),
+          signal: controller.signal,
+        }
+      );
+    } catch (fetchErr) {
+      clearTimeout(timer);
+      const isTimeout =
+        fetchErr instanceof Error && fetchErr.name === "AbortError";
+      return new Response(
+        JSON.stringify({
+          error: isTimeout
+            ? "The AI took too long to respond. Please try again in a moment."
+            : "Could not reach the AI service. Please check your connection.",
         }),
-      }
-    );
+        { status: 504, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+    clearTimeout(timer);
 
     if (!response.ok) {
-      if (response.status === 429) {
+      if (isQuotaError(response.status)) {
         return new Response(
-          JSON.stringify({ error: "Rate limit exceeded. Please try again in a moment." }),
+          JSON.stringify({
+            error:
+              "quota_exhausted",
+          }),
           { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } }
         );
       }
-      if (response.status === 402) {
-        return new Response(
-          JSON.stringify({ error: "AI usage limit reached. Please try again later." }),
-          { status: 402, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-        );
-      }
       const t = await response.text();
-      console.error("AI gateway error:", response.status, t);
+      console.error("Google AI error:", response.status, t);
       return new Response(
-        JSON.stringify({ error: "AI service error" }),
+        JSON.stringify({ error: "AI service error. Please try again later." }),
         { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }

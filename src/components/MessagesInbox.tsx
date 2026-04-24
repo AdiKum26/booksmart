@@ -151,6 +151,7 @@ const MessagesInbox = ({ userId }: MessagesInboxProps) => {
           currentUserId={userId}
           open={true}
           onClose={handleCloseDialog}
+          existingConversationId={activeConv.id}
         />
       )}
     </div>
