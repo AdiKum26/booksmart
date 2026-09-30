@@ -19,7 +19,7 @@ import williamImg from "@/assets/william-xu.png";
 const teamMembers = [
   {
     name: "ZhiChen Ming Xia",
-    roles: ["Founder/CEO"],
+    roles: ["Founder/President"],
     email: "Booksmart.network@gmail.com",
     phone: "206-915-9943",
     image: zhichenImg,
