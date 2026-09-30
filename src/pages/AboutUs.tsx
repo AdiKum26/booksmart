@@ -50,11 +50,6 @@ const teamMembers = [
     image: adityaImg,
   },
   {
-    name: "Maggie Zhou",
-    roles: ["Corporate Ambassador &", "Marketing Communications Assistant"],
-    image: maggieImg,
-  },
-  {
     name: "Nathan Seamans",
     roles: ["Board Member/Website Tester", "Programming Team Member"],
     image: nathanImg,
