@@ -8,7 +8,6 @@ import tianhaoImg from "@/assets/tianhao-wu.png";
 
 import michaelImg from "@/assets/michael-cheng.png";
 import adityaImg from "@/assets/aditya-kumar.png";
-import maggieImg from "@/assets/maggie-zhou.png";
 import nathanImg from "@/assets/nathan-seamans.png";
 
 import sanjitImg from "@/assets/sanjit-subramaniam.png";
