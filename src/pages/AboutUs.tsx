@@ -8,7 +8,6 @@ import tianhaoImg from "@/assets/tianhao-wu.png";
 
 import michaelImg from "@/assets/michael-cheng.png";
 import adityaImg from "@/assets/aditya-kumar.png";
-import maggieImg from "@/assets/maggie-zhou.png";
 import nathanImg from "@/assets/nathan-seamans.png";
 
 import sanjitImg from "@/assets/sanjit-subramaniam.png";
@@ -48,11 +47,6 @@ const teamMembers = [
     name: "Aditya Kumar",
     roles: ["Technology Director", "Development Lead"],
     image: adityaImg,
-  },
-  {
-    name: "Maggie Zhou",
-    roles: ["Corporate Ambassador &", "Marketing Communications Assistant"],
-    image: maggieImg,
   },
   {
     name: "Nathan Seamans",
