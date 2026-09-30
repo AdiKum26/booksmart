@@ -4,6 +4,7 @@ import aboutHeroImage from "@/assets/about-hero-book.jpg";
 import zhichenImg from "@/assets/zhichen-ming-xia.png";
 import ethanImg from "@/assets/ethan-pogrebinsky.jpg";
 import allanImg from "@/assets/allan-xuan.png";
+import logoImg from "@/assets/logo.png";
 import tianhaoImg from "@/assets/tianhao-wu.png";
 
 import michaelImg from "@/assets/michael-cheng.png";
@@ -29,9 +30,9 @@ const teamMembers = [
     image: ethanImg,
   },
   {
-    name: "Allan Xuan",
+    name: "Allison Therson",
     roles: ["Director of Communications and", "Marketing"],
-    image: allanImg,
+    image: logoImg,
   },
   {
     name: "Tianhao Wu",
@@ -72,6 +73,11 @@ const teamMembers = [
     name: "William Xu",
     roles: ["Website Designer/Tester", "Programming Team Member"],
     image: williamImg,
+  },
+  {
+    name: "Allan Xuan",
+    roles: ["Booksmart Alumni"],
+    image: allanImg,
   },
 ];
 
