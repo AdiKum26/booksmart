@@ -29,9 +29,9 @@ const teamMembers = [
     image: ethanImg,
   },
   {
-    name: "Allan Xuan",
+    name: "Allison Therson",
     roles: ["Director of Communications and", "Marketing"],
-    image: allanImg,
+    image: logoImg,
   },
   {
     name: "Tianhao Wu",
